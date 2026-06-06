@@ -1,6 +1,6 @@
-Put your GLSL code in file "input.txt".
+Put your GLSL code in file "input.glsl".
 If you run the code without it, it will create this file with basic tamplate.
-Remember to end your code with "//".
-After you run the code, the output string will be stored in a file "output.txt".
+Remember to end your code with "///"(i will fix this).
+After you run the code, the output string will be stored in a file "output.c".
 
 I created my program for my verry basic needs, so it might not work with your project.
