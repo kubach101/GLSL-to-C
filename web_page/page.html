@@ -31,10 +31,6 @@
             letter-spacing: 0.05em;
         }
 
-        h1 span {
-            color: #9cdcfe;
-        }
-
         .container {
             width: 100%;
             max-width: 900px;
@@ -51,9 +47,14 @@
 
         label {
             font-size: 0.9rem;
-            color: #e86e18;
+            color: #888;
             text-transform: uppercase;
             letter-spacing: 0.08em;
+            transition: color 0.15s;
+        }
+
+        .pane.focused label {
+            color: #9cdcfe;
         }
 
         textarea {
@@ -61,7 +62,7 @@
             height: 400px;
             background: #252526;
             color: #d4d4d4;
-            border: 1px solid #333;
+            border: 1px solid #444;
             border-radius: 4px;
             padding: 1rem;
             font-family: monospace;
@@ -73,11 +74,7 @@
         }
 
         textarea:focus {
-            border-color: #e86e18;
-        }
-
-        textarea[readonly] {
-            color: #9cdcfe;
+            border-color: #9cdcfe;
         }
 
         .buttons {
@@ -104,20 +101,10 @@
             color: #9cdcfe;
         }
 
-        button:active {
-            background: #2d2d2d;
-        }
-
         button.primary {
-            padding: 1rem 1.5rem;
-            font-family: monospace;
-            font-size: 14px;
-            border-radius: 4px;
             border: 1px solid #abaaaa;
             color: #2d2d2d;
             background-color: #d4d4d4;
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s;
             font-weight: bold;
         }
 
@@ -139,12 +126,30 @@
         #status.error {
             color: #df1010;
         }
+
+        #info {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 11px;
+            color: #888;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 4px 8px;
+            background: #252526;
+            transition: border-color 0.15s, color 0.15s;
+        }
+
+        #info:hover {
+            border-color: #9cdcfe;
+            color: #9cdcfe;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>GLSL <span>→</span> C string</h1>
+    <h1>GLSL <span>→</span> C-string</h1>
 
     <div class="container">
 
@@ -169,7 +174,6 @@
 
     <script>
         function convert() {
-
             let input = document.getElementById("input").value;
 
             if (!input.trim()) {
@@ -181,13 +185,10 @@
             let result = [];
 
             for (let line of lines) {
-
                 line = line.replace(/\r$/, "");
 
                 let ci = line.indexOf("//");
-                if (ci !== -1) {
-                    line = line.substring(0, ci);
-                }
+                if (ci !== -1) line = line.substring(0, ci);
 
                 line = line.trimEnd();
 
@@ -197,59 +198,44 @@
             }
 
             document.getElementById("output").value = result.join("\n");
-
             setStatus("CONVERTED", true);
-
         }
+
         function copyOutput() {
-
             let val = document.getElementById("output").value;
-
-            if (!val) {
-                setStatus("NO OUTPUT", false);
-                return;
-            }
-
+            if (!val) { setStatus("NO OUTPUT", false); return; }
             navigator.clipboard.writeText(val)
                 .then(() => setStatus("COPIED", true))
                 .catch(() => setStatus("COPY FAILED", false));
         }
 
         function downloadOutput() {
-
             let val = document.getElementById("output").value;
-
-            if (!val) {
-                setStatus("NO OUTPUT", false);
-                return;
-            }
+            if (!val) { setStatus("NO OUTPUT", false); return; }
 
             let blob = new Blob([val], { type: "text/plain" });
-
             let a = document.createElement("a");
             a.href = URL.createObjectURL(blob);
             a.download = "shader_string.c";
-
             a.click();
-
             URL.revokeObjectURL(a.href);
-
             setStatus("DOWNLOAD COMPLETE", true);
         }
 
+        document.querySelectorAll("textarea").forEach(ta => {
+            ta.addEventListener("focus", () => ta.closest(".pane").classList.add("focused"));
+            ta.addEventListener("blur", () => ta.closest(".pane").classList.remove("focused"));
+        });
+
         function setStatus(msg, success = true) {
             let s = document.getElementById("status");
-
             s.textContent = msg;
             s.className = success ? "success" : "error";
-
-            setTimeout(() => {
-                s.textContent = "";
-                s.className = "";
-            }, 2000);
+            setTimeout(() => { s.textContent = ""; s.className = ""; }, 2000);
         }
-
     </script>
+
+    <div id="info">Author: Jakub Chmura</div>
 
 </body>
 
