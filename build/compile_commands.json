@@ -1,8 +1,0 @@
-[
-{
-  "directory": "C:/glsl_editor/build",
-  "command": "C:\\msys64\\ucrt64\\bin\\cc.exe -g -std=gnu11 -o CMakeFiles\\run.dir\\src\\main.c.obj -c C:\\glsl_editor\\src\\main.c",
-  "file": "C:/glsl_editor/src/main.c",
-  "output": "C:/glsl_editor/build/CMakeFiles/run.dir/src/main.c.obj"
-}
-]

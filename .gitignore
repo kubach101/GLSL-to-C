@@ -1,5 +1,4 @@
 input.glsl
 output.c
-
-#executables
-*.exe
+.vscode/
+exe

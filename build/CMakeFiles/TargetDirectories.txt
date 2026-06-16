@@ -1,3 +1,0 @@
-C:/glsl_editor/build/CMakeFiles/run.dir
-C:/glsl_editor/build/CMakeFiles/edit_cache.dir
-C:/glsl_editor/build/CMakeFiles/rebuild_cache.dir
