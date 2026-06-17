@@ -1,6 +1,3 @@
-Put your GLSL code in file "input.glsl".
-If you run the code without it, it will create this file with basic tamplate.
-Remember to end your code with "///"(i will fix this).
+Put your GLSL code in file "input.glsl" found in "io" directory.
+You don't need to have the input and output files, but the "io" folder must exist
 After you run the code, the output string will be stored in a file "output.c".
-
-I created my program for my verry basic needs, so it might not work with your project.
