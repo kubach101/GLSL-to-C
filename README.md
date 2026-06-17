@@ -20,6 +20,8 @@ In that case having a full app wasn't that useful. So I created website based on
 
 I was familiar with html and css but I needed some help from AI in translating my C code to JavaScript.
 
+The design of the website was inspired by Visual Studio code.
+
 
 **At the end I think I created a useful pice of software somebody might acctually use.**
 
