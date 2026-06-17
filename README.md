@@ -21,9 +21,9 @@ In that case having a full app wasn't that useful. So I created website based on
 I was familiar with html and css but I needed some help from AI in translating my C code to JavaScript.
 
 
+**At the end I think I created a useful pice of software somebody might acctually use.**
 
 
 
-###### At the end I think I created a useful pice of software somebody might acctually use.
 If I made any mistakes I am sorry for that. I checked few times but there might be some :(.
 
