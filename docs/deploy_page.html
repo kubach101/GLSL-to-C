@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="pl">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLSL to C-string converter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: normal;
+            color: #9cdcfe;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .pane {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.9rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: color 0.15s;
+        }
+
+        .pane.focused label {
+            color: #9cdcfe;
+        }
+
+        textarea {
+            width: 100%;
+            height: 400px;
+            background: #252526;
+            color: #d4d4d4;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        textarea:focus {
+            border-color: #9cdcfe;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            grid-column: 1 / -1;
+        }
+
+        button {
+            padding: 1rem 1.5rem;
+            font-family: monospace;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #2d2d2d;
+            color: #d4d4d4;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        button:hover {
+            border-color: #9cdcfe;
+            color: #9cdcfe;
+        }
+
+        button.primary {
+            border: 1px solid #abaaaa;
+            color: #2d2d2d;
+            background-color: #d4d4d4;
+            font-weight: bold;
+        }
+
+        button.primary:hover {
+            background-color: #9cdcfe;
+            border-color: #9cdcfe;
+        }
+
+        #status {
+            font-size: 16px;
+            align-self: center;
+            margin-left: auto;
+        }
+
+        #status.success {
+            color: #10df17;
+        }
+
+        #status.error {
+            color: #df1010;
+        }
+
+        #info {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 11px;
+            color: #888;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 4px 8px;
+            background: #252526;
+            transition: border-color 0.15s, color 0.15s;
+        }
+
+        #info:hover {
+            border-color: #9cdcfe;
+            color: #9cdcfe;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>GLSL <span>→</span> C-string</h1>
+
+    <div class="container">
+
+        <div class="pane">
+            <label>INPUT:</label>
+            <textarea id="input" placeholder="GLSL" spellcheck="false"></textarea>
+        </div>
+
+        <div class="pane">
+            <label>OUTPUT:</label>
+            <textarea id="output" readonly placeholder="C-string" spellcheck="false"></textarea>
+        </div>
+
+        <div class="buttons">
+            <button class="primary" onclick="convert()">CONVERT</button>
+            <button onclick="copyOutput()">COPY</button>
+            <button onclick="downloadOutput()">DOWNLOAD(.c)</button>
+            <span id="status"></span>
+        </div>
+
+    </div>
+
+    <script>
+        function convert() {
+            let input = document.getElementById("input").value;
+
+            if (!input.trim()) {
+                setStatus("NO INPUT", false);
+                return;
+            }
+
+            let lines = input.split("\n");
+            let result = [];
+
+            for (let line of lines) {
+                line = line.replace(/\r$/, "");
+
+                let ci = line.indexOf("//");
+                if (ci !== -1) line = line.substring(0, ci);
+
+                line = line.trimEnd();
+
+                if (line.trim() === "") continue;
+
+                result.push(`"${line}\\n"`);
+            }
+
+            document.getElementById("output").value = result.join("\n");
+            setStatus("CONVERTED", true);
+        }
+
+        function copyOutput() {
+            let val = document.getElementById("output").value;
+            if (!val) { setStatus("NO OUTPUT", false); return; }
+            navigator.clipboard.writeText(val)
+                .then(() => setStatus("COPIED", true))
+                .catch(() => setStatus("COPY FAILED", false));
+        }
+
+        function downloadOutput() {
+            let val = document.getElementById("output").value;
+            if (!val) { setStatus("NO OUTPUT", false); return; }
+
+            let blob = new Blob([val], { type: "text/plain" });
+            let a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "shader_string.c";
+            a.click();
+            URL.revokeObjectURL(a.href);
+            setStatus("DOWNLOAD COMPLETE", true);
+        }
+
+        document.querySelectorAll("textarea").forEach(ta => {
+            ta.addEventListener("focus", () => ta.closest(".pane").classList.add("focused"));
+            ta.addEventListener("blur", () => ta.closest(".pane").classList.remove("focused"));
+        });
+
+        function setStatus(msg, success = true) {
+            let s = document.getElementById("status");
+            s.textContent = msg;
+            s.className = success ? "success" : "error";
+            setTimeout(() => { s.textContent = ""; s.className = ""; }, 2000);
+        }
+    </script>
+
+    <div id="info">Made by Jakub Chmura for Hackclub Stardance 2026<br>Version: 1.6<br>Based on my desktop app (included
+        in repostory)<br>Github repostory:<a
+            href="https://github.com/kubach101/GLSL-to-C">https://github.com/kubach101/GLSL-to-C</a>
+    </div>
+
+</body>
+
+</html>
